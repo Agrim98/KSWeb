@@ -130,7 +130,8 @@ function App() {
         .from('.services-heading', { autoAlpha: 0, y: 60, duration: 0.8 })
         .from('.service-card', {
           autoAlpha: 0,
-          x: -90,
+          y: 70,
+          scale: 0.96,
           stagger: 0.5,
           duration: 1,
         })
