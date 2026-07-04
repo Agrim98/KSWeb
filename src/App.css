@@ -73,6 +73,7 @@ header.hero {
 }
 
 .nav-links a {
+  position: relative;
   font-size: 11px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -80,8 +81,26 @@ header.hero {
   transition: opacity 0.25s ease;
 }
 
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -5px;
+  width: 100%;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.3s ease;
+}
+
 .nav-links a:hover {
   opacity: 1;
+}
+
+.nav-links a:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
 }
 
 /* ---------- hero ---------- */
@@ -124,11 +143,70 @@ header.hero {
   text-shadow: 0 8px 60px rgba(0, 0, 0, 0.35);
 }
 
+.scroll-hint {
+  position: absolute;
+  right: clamp(20px, 4vw, 48px);
+  bottom: 42svh;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.scroll-hint span {
+  writing-mode: vertical-rl;
+  font-size: 10px;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.scroll-hint i {
+  width: 1px;
+  height: 48px;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.9), transparent);
+  animation: scroll-drip 1.8s ease-in-out infinite;
+  transform-origin: top;
+}
+
+@keyframes scroll-drip {
+  0% {
+    transform: scaleY(0);
+  }
+  45% {
+    transform: scaleY(1);
+  }
+  100% {
+    transform: scaleY(1);
+    opacity: 0;
+  }
+}
+
 /* ---------- services ---------- */
 
 .services {
   height: 100svh;
   background: var(--color-ember-deep);
+}
+
+.walker {
+  position: absolute;
+  z-index: 1;
+  right: 3vw;
+  bottom: 4svh;
+  height: 68svh;
+  aspect-ratio: 896 / 1200;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.walker img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 24px 30px rgba(0, 0, 0, 0.45));
+  will-change: transform;
 }
 
 .services-inner {
@@ -163,6 +241,12 @@ header.hero {
   padding: 18px 28px;
   width: min(520px, 100%);
   box-shadow: 0 18px 50px rgba(0, 0, 0, 0.25);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.service-card:hover {
+  transform: translateY(-5px) scale(1.015);
+  box-shadow: 0 28px 60px rgba(0, 0, 0, 0.35);
 }
 
 .service-card--1 {
@@ -349,8 +433,17 @@ header.hero {
   }
 
   .services .scene-bg {
-    background-position: 72% center;
-    opacity: 0.45;
+    background-position: 60% center;
+  }
+
+  .walker {
+    height: 42svh;
+    right: 0;
+    bottom: 2svh;
+  }
+
+  .scroll-hint {
+    display: none;
   }
 
   .manifesto .scene-bg--right {

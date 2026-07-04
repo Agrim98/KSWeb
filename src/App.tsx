@@ -3,11 +3,23 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useGSAP } from '@gsap/react'
 import heroScene from './assets/hero_scene.webp'
-import pointingScene from './assets/pointing_scene.webp'
 import kitchenScene from './assets/kitchen_scene.webp'
+import backdrop from './assets/backdrop.webp'
+import walkA from './assets/walk_a.webp'
+import walkB from './assets/walk_b.webp'
+import walkC from './assets/walk_c.webp'
+import pointCutout from './assets/point_cutout.webp'
 import './App.css'
 
 gsap.registerPlugin(ScrollTrigger, useGSAP)
+
+// A→B→C→B loops like a flipbook walk cycle
+const walkFrames = [walkA, walkB, walkC, walkB]
+// Preload so scroll-driven frame swaps never flicker
+for (const src of [...walkFrames, pointCutout]) {
+  const img = new Image()
+  img.src = src
+}
 
 const services = [
   {
@@ -35,6 +47,7 @@ const platforms = ['TikTok', 'Instagram Reels', 'YouTube Shorts', 'Google Maps']
 
 function App() {
   const root = useRef<HTMLDivElement>(null)
+  const walkerImg = useRef<HTMLImageElement>(null)
 
   useGSAP(
     () => {
@@ -71,22 +84,55 @@ function App() {
         },
       })
 
-      // Services: pinned, cards slide in one by one
+      // Services: pinned — bunny walks in, points, then cards slide in
+      const walkCycle = { progress: 0 }
+      const stepCount = 10 // frame swaps across the walk
+      gsap.set('.walker', { x: '70vw' })
+
       gsap
         .timeline({
           scrollTrigger: {
             trigger: '.services',
             start: 'top top',
-            end: '+=180%',
+            end: '+=260%',
             pin: true,
             scrub: 0.6,
           },
         })
-        .from('.services-heading', { autoAlpha: 0, y: 60 })
+        // walk in from off-screen right
+        .to('.walker', { x: 0, duration: 4, ease: 'none' })
+        .to(
+          walkCycle,
+          {
+            progress: 1,
+            duration: 4,
+            ease: 'none',
+            onUpdate: () => {
+              const img = walkerImg.current
+              if (!img) return
+              const p = walkCycle.progress
+              const frame = walkFrames[Math.floor(p * stepCount) % walkFrames.length]
+              if (img.src !== frame) img.src = frame
+              // gentle step bob + sway
+              const beat = p * Math.PI * stepCount * 0.5
+              gsap.set(img, {
+                y: -Math.abs(Math.sin(beat)) * 12,
+                rotation: Math.sin(beat) * 1.5,
+              })
+            },
+          },
+          0,
+        )
+        // arrive: settle and switch to the pointing pose
+        .set(walkerImg.current, { attr: { src: pointCutout }, y: 0, rotation: 0 })
+        .from('.walker', { scale: 0.98, duration: 0.4, ease: 'power2.out' })
+        // ...and present what we cook up
+        .from('.services-heading', { autoAlpha: 0, y: 60, duration: 0.8 })
         .from('.service-card', {
           autoAlpha: 0,
-          y: 120,
-          stagger: 0.35,
+          x: -90,
+          stagger: 0.5,
+          duration: 1,
         })
 
       // Manifesto: pinned, word-by-word reveal
@@ -142,6 +188,10 @@ function App() {
           style={{ backgroundImage: `url(${heroScene})` }}
         />
         <p className="hero-eyebrow">AI Viral Content for Hospitality</p>
+        <div className="scroll-hint" aria-hidden="true">
+          <span>Scroll</span>
+          <i />
+        </div>
         <h1 className="hero-title" aria-label="Kaleum Studios">
           Kaleum&nbsp;Studios
         </h1>
@@ -150,8 +200,11 @@ function App() {
       <section className="services" id="work">
         <div
           className="scene-bg"
-          style={{ backgroundImage: `url(${pointingScene})` }}
+          style={{ backgroundImage: `url(${backdrop})` }}
         />
+        <div className="walker">
+          <img ref={walkerImg} src={walkA} alt="Kaleum bunny chef walking in" />
+        </div>
         <div className="services-inner">
           <p className="services-heading">What we cook up</p>
           <div className="service-cards">
