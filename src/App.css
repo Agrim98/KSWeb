@@ -509,24 +509,17 @@
   background: var(--bg);
 }
 
-.showreel-inner {
-  padding: clamp(56px, 10vh, 120px) clamp(20px, 5vw, 72px);
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-
-.showreel-frame {
+/* Full-bleed reel: edge to edge, muted autoplay, floating sound button */
+.showreel-stage {
   position: relative;
   width: 100%;
   aspect-ratio: 16 / 9;
-  border-radius: var(--radius-card);
+  background: #000;
   overflow: hidden;
-  background: var(--surface);
 }
 
-.showreel-frame img,
-.showreel-frame iframe {
+.showreel-stage img,
+.showreel-stage iframe {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -535,56 +528,67 @@
   border: 0;
 }
 
-.showreel-overlay {
+.showreel-stage .reel-btn {
   position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
+  left: 50%;
+  bottom: clamp(20px, 6vh, 48px);
+  transform: translateX(-50%);
+  z-index: 3;
+}
+
+.showreel-stage .reel-btn:hover {
+  transform: translateX(-50%) scale(1.06);
+}
+
+.reel-btn {
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  gap: 18px;
-  background: rgba(11, 10, 9, 0.45);
-}
-
-.showreel-overlay p {
-  font-size: 13px;
-  letter-spacing: 0.3em;
+  gap: 12px;
+  min-height: 52px;
+  padding: 14px clamp(24px, 3vw, 36px);
+  border-radius: var(--radius-pill);
+  background: rgba(11, 10, 9, 0.72);
+  border: 1px solid rgba(239, 233, 221, 0.35);
+  backdrop-filter: blur(8px);
+  color: var(--cream);
+  font-family: var(--font-ui);
+  font-size: clamp(13px, 1.4vw, 15px);
+  font-weight: 600;
+  letter-spacing: 0.26em;
   text-transform: uppercase;
-  color: var(--cream-dim);
+  transition: transform 0.25s ease, background 0.25s ease, border-color 0.25s ease;
+  animation: reel-pulse 2.6s ease-in-out infinite;
 }
 
-.showreel-play {
-  width: clamp(64px, 8vw, 96px);
-  height: clamp(64px, 8vw, 96px);
-  border-radius: 50%;
-  border: 1px solid rgba(239, 233, 221, 0.5);
-  position: relative;
-  animation: play-pulse 2.4s ease-in-out infinite;
+.reel-btn svg {
+  width: 1em;
+  height: 1em;
+  color: var(--ember);
+  transition: transform 0.25s ease;
 }
 
-.showreel-play::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 53%;
-  transform: translate(-50%, -50%);
-  border-left: 16px solid var(--cream);
-  border-top: 10px solid transparent;
-  border-bottom: 10px solid transparent;
+.reel-btn:hover {
+  transform: scale(1.06);
+  background: rgba(11, 10, 9, 0.9);
+  border-color: rgba(239, 233, 221, 0.7);
 }
 
-@keyframes play-pulse {
+.reel-btn:hover svg {
+  transform: translateX(4px);
+}
+
+@keyframes reel-pulse {
   0%,
   100% {
-    box-shadow: 0 0 0 0 rgba(230, 60, 30, 0.35);
+    box-shadow: 0 0 0 0 rgba(230, 60, 30, 0.3);
   }
   50% {
-    box-shadow: 0 0 0 22px rgba(230, 60, 30, 0);
+    box-shadow: 0 0 0 18px rgba(230, 60, 30, 0);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .showreel-play {
+  .reel-btn {
     animation: none;
   }
 }
@@ -665,6 +669,43 @@
 
 .services-teaser:hover .arrow {
   transform: translateX(10px);
+}
+
+.services-teaser-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 6px;
+  font-size: clamp(12px, 1.3vw, 14px);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ember);
+}
+
+.services-teaser-hint::after {
+  content: '';
+  width: 34px;
+  height: 1px;
+  background: var(--ember);
+  animation: hint-nudge 1.6s ease-in-out infinite;
+}
+
+@keyframes hint-nudge {
+  0%,
+  100% {
+    transform: translateX(0);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translateX(8px);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .services-teaser-hint::after {
+    animation: none;
+  }
 }
 
 /* ============ contact ============ */
@@ -810,13 +851,60 @@
 /* ---- brand banner ---- */
 
 .contact-brand {
-  padding: 0 clamp(20px, 5vw, 72px) clamp(28px, 5vh, 56px);
+  position: relative;
+  margin: 0 clamp(20px, 5vw, 72px) clamp(28px, 5vh, 56px);
+  border-radius: var(--radius-card);
+  overflow: hidden;
 }
 
 .contact-brand img {
   display: block;
   width: 100%;
-  border-radius: var(--radius-card);
+}
+
+/* Warm glow blooms up from behind the lettering and lights the whole title */
+.brand-sheen {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 62% 72% at 50% 55%,
+    rgba(255, 200, 130, 0.9),
+    rgba(255, 130, 45, 0.6) 40%,
+    rgba(230, 60, 30, 0.3) 62%,
+    transparent 80%
+  );
+  mix-blend-mode: screen;
+  opacity: 0;
+  transform: scale(0.65);
+  transform-origin: 50% 60%;
+  animation: brand-glow-bloom 9s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes brand-glow-bloom {
+  0% {
+    opacity: 0;
+    transform: scale(0.65);
+  }
+  42% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  58% {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.12);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brand-sheen {
+    animation: none;
+    opacity: 0;
+  }
 }
 
 .contact-title {

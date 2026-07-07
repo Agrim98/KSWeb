@@ -6,10 +6,9 @@ import Footer from '../components/Footer'
 import BriefForm from '../components/BriefForm'
 import { useTransitionNav } from '../transition'
 import { stills } from '../stills'
-import logoBanner from '../assets/logo_banner.webp'
+import brandTitle from '../assets/brand_title.webp'
 
-// Paste the Vimeo video ID here once the showreel upload is live, e.g. '987654321'
-const SHOWREEL_VIMEO_ID = ''
+const SHOWREEL_VIMEO_ID = '1207603496'
 
 const kicker = ['Bold Ideas', 'Viral Instagram Hooks', 'Endless Reach']
 
@@ -34,7 +33,27 @@ function Home({ introReady }: HomeProps) {
   const peekRef = useRef<HTMLDivElement>(null)
   const contactRef = useRef<HTMLElement>(null)
   const [peekIndex, setPeekIndex] = useState(0)
+  const [reelInView, setReelInView] = useState(false)
+  const [reelSound, setReelSound] = useState(false)
+  const showreelRef = useRef<HTMLDivElement>(null)
   const go = useTransitionNav()
+
+  // Lazy-start the muted background reel when the section approaches
+  useEffect(() => {
+    const el = showreelRef.current
+    if (!el) return
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setReelInView(true)
+          io.disconnect()
+        }
+      },
+      { rootMargin: '300px 0px' },
+    )
+    io.observe(el)
+    return () => io.disconnect()
+  }, [])
 
   // Cycle the floating media fragment
   useEffect(() => {
@@ -96,18 +115,6 @@ function Home({ introReady }: HomeProps) {
           start: 'top top',
           end: 'bottom 65%',
           scrub: 0.4,
-        },
-      })
-
-      // Showreel frame grows slightly as it enters
-      gsap.from('.showreel-frame', {
-        scale: 0.94,
-        y: 60,
-        scrollTrigger: {
-          trigger: '.showreel',
-          start: 'top 85%',
-          end: 'top 20%',
-          scrub: 0.6,
         },
       })
 
@@ -179,26 +186,33 @@ function Home({ introReady }: HomeProps) {
 
       <section className="showreel">
         <Marquee items={marqueeItems} />
-        <div className="showreel-inner">
-          <p className="eyebrow reveal">Showreel</p>
-          <div className="showreel-frame reveal">
-            {SHOWREEL_VIMEO_ID ? (
-              <iframe
-                src={`https://player.vimeo.com/video/${SHOWREEL_VIMEO_ID}?title=0&byline=0&portrait=0`}
-                title="Kaleum Studios showreel"
-                allow="autoplay; fullscreen; picture-in-picture"
-                allowFullScreen
-              />
-            ) : (
-              <>
-                <img src={stills.club} alt="Kaleum Studios showreel preview" />
-                <div className="showreel-overlay">
-                  <span className="showreel-play" aria-hidden="true" />
-                  <p>Showreel — uploading soon</p>
-                </div>
-              </>
-            )}
-          </div>
+        <div className="showreel-stage" ref={showreelRef}>
+          {reelSound ? (
+            <iframe
+              src={`https://player.vimeo.com/video/${SHOWREEL_VIMEO_ID}?autoplay=1&title=0&byline=0&portrait=0`}
+              title="Kaleum Studios showreel"
+              allow="autoplay; fullscreen; picture-in-picture"
+              allowFullScreen
+            />
+          ) : (
+            <>
+              <img src={stills.club} alt="" aria-hidden="true" />
+              {reelInView && (
+                <iframe
+                  src={`https://player.vimeo.com/video/${SHOWREEL_VIMEO_ID}?background=1`}
+                  title="Kaleum Studios showreel (muted preview)"
+                  allow="autoplay; fullscreen; picture-in-picture"
+                  tabIndex={-1}
+                />
+              )}
+              <button type="button" className="reel-btn" onClick={() => setReelSound(true)}>
+                Play Reel
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M8 5.5v13l11-6.5z" fill="currentColor" />
+                </svg>
+              </button>
+            </>
+          )}
         </div>
       </section>
 
@@ -229,6 +243,9 @@ function Home({ introReady }: HomeProps) {
               <path d="M4 12h14m0 0-6-6m6 6-6 6" fill="none" stroke="currentColor" strokeWidth="2" />
             </svg>
           </span>
+          <span className="services-teaser-hint">
+            Check it out to know more — our full six-step pipeline
+          </span>
         </div>
       </a>
 
@@ -257,7 +274,8 @@ function Home({ introReady }: HomeProps) {
           </div>
         </div>
         <div className="contact-brand reveal">
-          <img src={logoBanner} alt="Kaleum Creative Studios" loading="lazy" />
+          <img src={brandTitle} alt="Kaleum Studios" loading="lazy" />
+          <span className="brand-sheen" aria-hidden="true" />
         </div>
         <Footer />
       </section>
