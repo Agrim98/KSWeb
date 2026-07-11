@@ -1,3 +1,20 @@
+/* Self-hosted fonts — no Google CDN dependency, no GDPR exposure */
+@font-face {
+  font-family: 'Anton';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('./assets/fonts/anton-latin.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Space Grotesk';
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url('./assets/fonts/space-grotesk-latin.woff2') format('woff2');
+}
+
 :root {
   /* Kaleum dark cinematic studio palette */
   --bg: #0b0a09;

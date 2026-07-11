@@ -749,6 +749,15 @@
   width: 100%;
 }
 
+.brief-honey {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
 .brief-row {
   display: grid;
   grid-template-columns: 1fr 1fr;

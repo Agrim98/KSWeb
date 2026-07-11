@@ -50,6 +50,15 @@ function BriefForm() {
 
   return (
     <form className="brief-form" onSubmit={onSubmit}>
+      {/* Honeypot — humans never see it; bots that fill it get dropped by FormSubmit */}
+      <input
+        type="text"
+        name="_honey"
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden="true"
+        className="brief-honey"
+      />
       <div className="brief-row">
         <label className="brief-field">
           <span>Name *</span>
